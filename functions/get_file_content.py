@@ -1,5 +1,6 @@
 import os
 from functions.config import MAX_CHARS
+
 def get_file_content(working_directory, file_path):
     abs_working_dir = os.path.abspath(working_directory)
     target_filepath = os.path.abspath(os.path.join(working_directory, file_path))
@@ -16,4 +17,4 @@ def get_file_content(working_directory, file_path):
             return file_content_string
 
     except Exception as e:
-        return f'Error: {e}'
+        return f'Error reading file "{file_path}": {e}'
