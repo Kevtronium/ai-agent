@@ -1,6 +1,6 @@
 import os
 from google.genai import types
-from functions.config import MAX_CHARS
+from config import MAX_CHARS
 
 def get_file_content(working_directory, file_path):
     abs_working_dir = os.path.abspath(working_directory)
@@ -14,10 +14,10 @@ def get_file_content(working_directory, file_path):
     try:
         with open(target_filepath, "r") as f:
             file_content_string = f.read(MAX_CHARS)
-            print(file_content_string)
 
             if os.path.getsize(target_filepath) > MAX_CHARS:
                 file_content_string += f' [...File "{file_path}" truncated at {MAX_CHARS} characters]'
+            
             return file_content_string
 
     except Exception as e:
