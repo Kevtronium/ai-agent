@@ -3,18 +3,58 @@ import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from functions.get_files_info import schema_get_files_info
-from functions.get_file_content import schema_get_file_content
-from functions.write_file import schema_write_file
-from functions.run_python import schema_run_python
+from functions.get_files_info import (get_files_info, schema_get_files_info)
+from functions.get_file_content import (get_file_content, schema_get_file_content)
+from functions.write_file import (write_file, schema_write_file)
+from functions.run_python import (run_python_file, schema_run_python)
 
+def call_function(function_call_part, verbose=False):
+    working_dir = "calculator"
+    functions = {
+        "get_files_info": get_files_info, 
+        "get_file_content": get_file_content,
+        "write_file": write_file,
+        "run_python_file": run_python_file
+    }
+    
+    if verbose:
+        print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+        print(f"- Calling function: {function_call_part.name}")
+
+    if not functions[function_call_part.name]:
+        return types.Content(
+        role="tool",
+        parts=[
+        types.Part.from_function_response(
+            name=function_call_part.name,
+            response={"error": f"Unknown function: {function_call_part.name}"},
+        )
+    ],
+)
+
+    result = functions[function_call_part.name](working_dir, **function_call_part.args)
+
+    return types.Content(
+    role="tool",
+    parts=[
+        types.Part.from_function_response(
+            name=function_call_part.name,
+            response={"result": result},
+        )
+    ],
+)
+    
 
 def print_response(response, user_prompt, verbose=False):
     function_calls = response.function_calls
 
     if function_calls:
         for function_call in function_calls:
-            print(f"Calling function: {function_call.name}({function_call.args})")
+
+            result = call_function(function_call, verbose)
+            if not result.parts[0].function_response.response:
+                raise Exception("Fatal Error: Function call returned no response.")
+            print(f"-> {result.parts[0].function_response.response}")
 
     print("Response: ")
     print(response.text)
