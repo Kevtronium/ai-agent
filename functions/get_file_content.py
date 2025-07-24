@@ -14,7 +14,10 @@ def get_file_content(working_directory, file_path):
     try:
         with open(target_filepath, "r") as f:
             file_content_string = f.read(MAX_CHARS)
-            file_content_string += f'[...File "{file_path}" truncated at {MAX_CHARS} characters]'
+            print(file_content_string)
+
+            if os.path.getsize(target_filepath) > MAX_CHARS:
+                file_content_string += f' [...File "{file_path}" truncated at {MAX_CHARS} characters]'
             return file_content_string
 
     except Exception as e:
@@ -31,5 +34,6 @@ schema_get_file_content = types.FunctionDeclaration(
                 description="The path to the file to be read, relative to the working directory.",
             ),
         },
+        required=["file_path"],
     ),
 )
