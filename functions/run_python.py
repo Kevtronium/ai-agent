@@ -35,7 +35,7 @@ def run_python_file(working_directory, file_path, args=[]):
     except Exception as e:
         return f"Error: executing Python file: {e}"
 
-schema_run_python = types.FunctionDeclaration(
+schema_run_python_file = types.FunctionDeclaration(
     name="run_python_file",
     description="Runs a Python file constrained to the working directory.",
     parameters=types.Schema(
@@ -47,10 +47,14 @@ schema_run_python = types.FunctionDeclaration(
             ),
             "args": types.Schema(
                 type=types.Type.ARRAY,
-                description="A list of arguments to be passed to the Python file. If not provided, then the Python file will run no arguments",
-                items={"type": types.Type.STRING} 
+                items=types.Schema(
+                    type=types.Type.STRING,
+                   description="Optional arguments to pass to the Python file.",
+                ),
+                description="Optional arguments to pass to the Python file.",
             ),
         },
+        required=["file_path"],
     ),
 )
 
